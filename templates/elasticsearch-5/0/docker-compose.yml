@@ -1,0 +1,237 @@
+version: '2'
+services:
+  elasticsearch-master-1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: master-1
+    labels:
+      type: master-node
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=master-1
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=elasticsearch-master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+
+  elasticsearch-master-2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: master-2
+    labels:
+      type: master-node
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=master-2
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=elasticsearch-master-1
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+
+  elasticsearch-datanode-1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: data-1
+    labels:
+      type: data-node
+    links:
+      - elasticsearch-master-1:master-1
+      - elasticsearch-master-2:master-2
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=data-1
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=master-1,master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=false
+      - node.data=true
+      - node.ingest=true
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - elasticsearch-master-1
+      - elasticsearch-master-2
+      
+  elasticsearch-datanode-2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: data-2
+    labels:
+      type: data-node
+    links:
+      - elasticsearch-master-1:master-1
+      - elasticsearch-master-2:master-2
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=data-2
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=master-1,master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=false
+      - node.data=true
+      - node.ingest=true
+      - xpack.security.enabled=false
+    ulimits:  
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK   
+    depends_on:
+      - elasticsearch-master-1
+      - elasticsearch-master-2
+      
+  elasticsearch-datanode-3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: data-3
+    labels:
+      type: data-node
+    links:
+      - elasticsearch-master-1:master-1
+      - elasticsearch-master-2:master-2
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=data-3
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=master-1,master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=false
+      - node.data=true
+      - node.ingest=true
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - elasticsearch-master-1
+      - elasticsearch-master-2
+      
+  elasticsearch-clientnode-1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: client-1
+    labels:
+      type: client-node
+    links:
+      - elasticsearch-master-1:master-1
+      - elasticsearch-master-2:master-2
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=client-1
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=master-1,master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=false
+      - node.data=false
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - elasticsearch-master-1
+      - elasticsearch-master-2
+
+  elasticsearch-clientnode-2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    container_name: client-2
+    labels:
+      type: client-node
+    links:
+      - elasticsearch-master-1:master-1
+      - elasticsearch-master-2:master-2
+    environment:
+      - cluster.name=${cluster_name}
+      - node.name=client-2
+      - bootstrap.memory_lock=true
+      - discovery.zen.ping.unicast.hosts=master-1,master-2
+      - discovery.zen.minimum_master_nodes=2
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.master=false
+      - node.data=false
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1000000000
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - elasticsearch-master-1
+      - elasticsearch-master-2
+   
+  es-client-lb:
+    image: rancher/lb-service-haproxy
+    links:
+      - elasticsearch-clientnode-1:client-1
+      - elasticsearch-clientnode-2:client-2
+    ports:
+      - "9200:9200"
+
+  es-head:
+    image: devserver2.corp.skysoft-atm.com:5000/skysoft/vc-docker-es-head:1.0.0
+    links:
+      - es-client-lb:elasticsearch
+    ports:
+      - "8080:80"

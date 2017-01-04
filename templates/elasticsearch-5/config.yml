@@ -1,0 +1,6 @@
+name: Elasticsearch 5
+description: |
+  Elasticsearch, you know for search!
+version: 5.x
+category: ELK
+maintainer: damien.chambon.pro@gmail.com

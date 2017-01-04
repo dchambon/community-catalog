@@ -1,0 +1,30 @@
+version: '2'
+services:
+  es-client-lb:
+    scale: 1
+    lb_config:
+      port_rules:
+      - source_port: 9200
+        target_port: 9200
+        # Target any service that has type=client-node as a label
+        selector: type=client-node
+        protocol: http
+    health_check:
+      port: 9200
+      interval: 2000
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      response_timeout: 2000
+
+.catalog:
+  name: "Elasticsearch cluster"
+  version: "5.0.0"
+  description: "Cluster elasticsearch"
+  questions:
+    - variable: "cluster_name"
+      label: "Elasticsearch cluster name"
+      description: |
+        Cluster name.
+      type: "string"
+      required: true
+      default: "docker-cluster"
