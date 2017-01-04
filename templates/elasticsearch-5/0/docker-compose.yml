@@ -230,7 +230,7 @@ services:
       - "9200:9200"
 
   es-head:
-    image: devserver2.corp.skysoft-atm.com:5000/skysoft/vc-docker-es-head:1.0.0
+    image: dchambon/docker-es-head
     links:
       - es-client-lb:elasticsearch
     ports:
